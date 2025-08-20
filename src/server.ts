@@ -12,10 +12,17 @@ import {
 dotenv.config();
 
 // Create the MCP server
-const server = new McpServer({
-  name: "IRS Tax Filing Buddy",
-  version: "1.0.0",
-});
+const server = new McpServer(
+  {
+    name: "IRS Tax Filing Buddy",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
 
 // Tool function for IRS Tax Filing Buddy info
 async function getTaxBuddyInfo() {
@@ -312,11 +319,12 @@ server.registerTool(
 async function init() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log("IRS Tax Filing Buddy MCP server is running...");
+  // Remove console.log to avoid interfering with MCP protocol
 }
 
 // Call the initialization
 init().catch((error) => {
-  console.error("Server error:", error);
+  // Log to stderr instead of stdout to avoid MCP protocol interference
+  process.stderr.write(`Server error: ${error}\n`);
   process.exit(1);
 });
