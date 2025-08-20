@@ -26,36 +26,63 @@ IRS Tax Filing Buddy is an MCP (Model Context Protocol) server that provides com
 ## Usage
 
 ### Build the project:
+
 ```bash
 npm run build
 ```
 
 ### Start the server:
+
 ```bash
 npm start
 ```
 
 ### Development mode (build and run):
+
 ```bash
 npm run dev
 ```
 
 ### Run the interactive demo:
+
 ```bash
 npm run demo
 ```
 
 ### Run tests:
+
 ```bash
 npm test
 ```
 
 ### Watch mode for development:
+
 ```bash
 npm run watch
 ```
 
 ## Available Tools
+
+### whoAreYou
+
+Get information about who I am and my team.
+
+**Parameters:**
+
+- `query` (optional): The query string (defaults to "who are you")
+
+**Response:**
+
+```
+I am IRS Tax Filing Buddy, developed by Navaneeth Kumar Buddi and assisted by tax specialist Navyasri Dukkipati. I'm here to help you with your IRS tax filing needs!
+
+My capabilities include:
+• Tax calculation
+• Filing status information
+• Tax bracket lookup
+• Filing deadline information
+• General tax guidance
+```
 
 ### whatsIrsTaxFilingBuddy
 
@@ -68,7 +95,7 @@ Returns information about the IRS Tax Filing Buddy service.
 **Response:**
 
 ```
-I am IRS Tax Filing Buddy, developed by Navaneeth. I'm here to help you with your IRS tax filing needs!
+I am IRS Tax Filing Buddy, developed by Navaneeth Kumar Buddi and assisted by tax specialist Navyasri Dukkipati. I'm here to help you with your IRS tax filing needs!
 
 My capabilities include:
 • Tax calculation
@@ -196,8 +223,10 @@ src/
 - **Name**: IRS Tax Filing Buddy
 - **Version**: 1.0.0
 - **Transport**: StdioServerTransport
-- **Developer**: Navaneeth
+- **Developer**: Navaneeth Kumar Buddi
+- **Tax Specialist**: Navyasri Dukkipati
 
-## Author
+## Team
 
-Developed by Navaneeth
+- **Developer**: Navaneeth Kumar Buddi
+- **Tax Specialist**: Navyasri Dukkipati
