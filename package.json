@@ -1,19 +1,24 @@
 {
   "name": "irs-tax-filing-buddy",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "test": "node test.js",
-    "start": "node server.js",
-    "demo": "node demo.js"
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsc && node dist/server.js",
+    "test": "node dist/test.js",
+    "demo": "node dist/demo.js",
+    "watch": "tsc --watch"
   },
   "keywords": [
     "irs",
     "tax",
     "filing",
     "buddy",
-    "assistant"
+    "assistant",
+    "typescript",
+    "mcp"
   ],
   "author": "Navaneeth",
   "license": "ISC",
@@ -22,5 +27,9 @@
     "@modelcontextprotocol/sdk": "^1.17.3",
     "dotenv": "^16.5.0",
     "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   }
 }
