@@ -1,0 +1,26 @@
+{
+  "name": "irs-tax-filing-buddy",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node server.js",
+    "demo": "node demo.js"
+  },
+  "keywords": [
+    "irs",
+    "tax",
+    "filing",
+    "buddy",
+    "assistant"
+  ],
+  "author": "Navaneeth",
+  "license": "ISC",
+  "description": "IRS Tax Filing Buddy - A personal assistant for IRS tax filing assistance developed by Navaneeth",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.3",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.64"
+  }
+}
