@@ -333,6 +333,7 @@ server.registerTool(
         .enum([
           "w2",
           "1099",
+          "1095",
           "schedule_c",
           "schedule_d",
           "schedule_e",

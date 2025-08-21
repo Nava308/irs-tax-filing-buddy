@@ -63,7 +63,7 @@ export class ClaudeService {
       );
 
       const message = await this.client.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-sonnet-4-20250514",
         max_tokens: 4000,
         temperature: 0.1, // Low temperature for consistent, accurate results
         messages: [
@@ -91,7 +91,7 @@ export class ClaudeService {
 
       return parsedResult;
     } catch (error) {
-      console.error("Claude API error:", error);
+      // Claude API error: ${error}
       throw new Error(
         `Failed to process documents with Claude: ${
           error instanceof Error ? error.message : "Unknown error"

@@ -130,6 +130,9 @@ export class DocumentValidator {
       case "1099":
         errors.push(...this.validate1099Content(document));
         break;
+      case "1095":
+        errors.push(...this.validate1095Content(document));
+        break;
       case "schedule_c":
         errors.push(...this.validateScheduleCContent(document));
         break;
@@ -171,6 +174,21 @@ export class DocumentValidator {
     for (const field of requiredFields) {
       if (!content.includes(field)) {
         errors.push(`1099 document should contain '${field}' information`);
+      }
+    }
+
+    return errors;
+  }
+
+  private validate1095Content(document: TaxDocument): string[] {
+    const errors: string[] = [];
+    const content = document.content.toLowerCase();
+
+    const requiredFields = ["1095", "health", "coverage", "employer"];
+
+    for (const field of requiredFields) {
+      if (!content.includes(field)) {
+        errors.push(`1095 document should contain '${field}' information`);
       }
     }
 

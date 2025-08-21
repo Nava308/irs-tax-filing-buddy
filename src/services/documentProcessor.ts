@@ -23,7 +23,7 @@ export class DocumentProcessor {
     try {
       this.claudeService = new ClaudeService();
     } catch (error) {
-      console.warn('Claude API not available, falling back to simulation mode');
+      // Claude API not available, falling back to simulation mode
       this.claudeService = null as any;
     }
     this.documentValidator = new DocumentValidator();
@@ -49,13 +49,15 @@ export class DocumentProcessor {
 
     // Validate the document before storing
     const validationResult = this.documentValidator.validateDocument(document);
-    
+
     if (!validationResult.isValid) {
-      throw new Error(`Document validation failed: ${validationResult.errors.join(', ')}`);
+      throw new Error(
+        `Document validation failed: ${validationResult.errors.join(", ")}`
+      );
     }
 
     if (validationResult.warnings.length > 0) {
-      console.warn(`Document warnings: ${validationResult.warnings.join(', ')}`);
+      // Document warnings: ${validationResult.warnings.join(", ")}
     }
 
     this.documents.set(documentId, document);
@@ -79,14 +81,17 @@ export class DocumentProcessor {
     }
 
     // Validate all documents together
-    const validationResult = this.documentValidator.validateMultipleDocuments(documents);
-    
+    const validationResult =
+      this.documentValidator.validateMultipleDocuments(documents);
+
     if (!validationResult.isValid) {
-      throw new Error(`Document validation failed: ${validationResult.errors.join(', ')}`);
+      throw new Error(
+        `Document validation failed: ${validationResult.errors.join(", ")}`
+      );
     }
 
     if (validationResult.warnings.length > 0) {
-      console.warn(`Document warnings: ${validationResult.warnings.join(', ')}`);
+      // Document warnings: ${validationResult.warnings.join(", ")}
     }
 
     // Use real Claude service if available, otherwise fall back to simulation
@@ -99,7 +104,7 @@ export class DocumentProcessor {
           taxYear
         );
       } catch (error) {
-        console.warn('Claude API failed, falling back to simulation:', error);
+        // Claude API failed, falling back to simulation: ${error}
         processedData = await this.simulateClaudeProcessing(
           this.createProcessingPrompt(documents, filingStatus, taxYear),
           documents
@@ -220,12 +225,12 @@ Please be accurate and only include information that is clearly stated in the do
    * Simulate Claude processing (replace with actual Claude API call)
    */
   private async simulateClaudeProcessing(
-    prompt: string,
+    _prompt: string,
     _documents: TaxDocument[]
   ): Promise<any> {
     // This is a simulation - in real implementation, this would call Claude API
-    console.log("Processing documents with Claude...");
-    console.log("Prompt:", prompt);
+    // Processing documents with Claude...
+    // Prompt: ${prompt}
 
     // Simulate processing delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -433,10 +438,13 @@ Please be accurate and only include information that is clearly stated in the do
       case "pdf":
         // For PDF, we return a base64 encoded string of the PDF buffer
         try {
-          const buffer = await this.pdfGenerator.generateForm1040PDF(filingData, calculatedTax);
-          return buffer.toString('base64');
+          const buffer = await this.pdfGenerator.generateForm1040PDF(
+            filingData,
+            calculatedTax
+          );
+          return buffer.toString("base64");
         } catch (error) {
-          console.error('PDF generation failed:', error);
+          // PDF generation failed: ${error}
           return this.generateText1040(filingData, calculatedTax);
         }
 

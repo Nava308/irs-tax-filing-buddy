@@ -11,6 +11,7 @@ export interface TaxDocument {
 export type TaxDocumentType =
   | "w2"
   | "1099"
+  | "1095"
   | "schedule_c"
   | "schedule_d"
   | "schedule_e"
@@ -124,4 +125,10 @@ export interface DocumentProcessingRequest {
   outputFormat: OutputFormat;
 }
 
-export type OutputFormat = "json" | "pdf" | "xml" | "irs_efile" | "mail_ready" | "text";
+export type OutputFormat =
+  | "json"
+  | "pdf"
+  | "xml"
+  | "irs_efile"
+  | "mail_ready"
+  | "text";
