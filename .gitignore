@@ -1,5 +1,13 @@
 node_modules/
 dist/
+test/*.js
+test/*.d.ts
+test/*.d.ts.map
+test/*.js.map
+demos/*.js
+demos/*.d.ts
+demos/*.d.ts.map
+demos/*.js.map
 .env
 .DS_Store
 *.log
