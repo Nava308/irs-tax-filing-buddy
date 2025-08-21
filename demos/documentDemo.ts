@@ -1,4 +1,4 @@
-import { DocumentProcessor } from './services/documentProcessor.js';
+import { DocumentProcessor } from '../src/services/documentProcessor.js';
 
 console.log("=== IRS Tax Filing Buddy - Document Processing Demo ===\n");
 

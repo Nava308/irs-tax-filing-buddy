@@ -43,16 +43,19 @@ npm start
 npm run dev
 ```
 
-### Run the interactive demo:
+### Run the interactive demos:
 
 ```bash
-npm run demo
+npm run demo                # Tax calculation demo
+npm run demo:documents      # Document processing demo
 ```
 
 ### Run tests:
 
 ```bash
-npm test
+npm test                    # Run all tests
+npm run test:tax           # Run only tax calculation tests
+npm run test:docs          # Run only document processing tests
 ```
 
 ### Watch mode for development:
@@ -188,6 +191,92 @@ Common deductions include:
 • Business expenses (if self-employed)
 ```
 
+### uploadTaxDocument
+
+Upload a tax document for processing (W2, 1099, etc.).
+
+**Parameters:**
+
+- `filename` (required): Name of the document file
+- `content` (required): Content of the tax document
+- `documentType` (required): Type of tax document ('w2', '1099', 'schedule_c', 'schedule_d', 'schedule_e', 'form_1040', 'other')
+
+**Response:**
+
+```
+Document uploaded successfully!
+
+Document ID: doc_1234567890_abc123
+Filename: w2_2024.txt
+Type: w2
+
+You can now use this document ID with other tax processing tools.
+```
+
+### processTaxDocuments
+
+Process uploaded tax documents with Claude and generate tax filing data.
+
+**Parameters:**
+
+- `documentIds` (required): Array of document IDs to process
+- `filingStatus` (required): Filing status ('single', 'married', 'head_of_household', 'qualifying_widow')
+- `taxYear` (required): Tax year (e.g., 2024)
+
+**Response:**
+
+```
+Documents processed successfully!
+
+Tax Filing Summary:
+Name: John Doe
+Filing Status: single
+Tax Year: 2024
+Total Income: $75,700
+Wages: $75,000
+Interest: $500
+Dividends: $200
+
+Use the generateTaxFiling tool to create complete tax forms.
+```
+
+### generateTaxFiling
+
+Generate complete tax filing with forms in specified format.
+
+**Parameters:**
+
+- `documentIds` (required): Array of document IDs to include
+- `filingStatus` (required): Filing status
+- `taxYear` (required): Tax year
+- `outputFormat` (required): Output format ('json', 'pdf', 'xml', 'irs_efile', 'mail_ready')
+
+**Response:**
+
+```
+Tax Filing Generated Successfully!
+
+📊 SUMMARY:
+Total Income: $75,700
+Total Deductions: $14,600
+Total Credits: $0
+Tax Owed: $7,175
+Refund Amount: $0
+Filing Deadline: April 15, 2025
+
+📋 FORMS GENERATED (JSON format):
+• 1040: Individual Income Tax Return
+
+📄 FORM CONTENTS:
+--- 1040 ---
+{
+  "form": "1040",
+  "personalInfo": { ... },
+  "income": { ... },
+  "calculatedTax": { ... }
+}
+```
+
 ## Technical Details
 
 This project uses:
@@ -203,10 +292,21 @@ This project uses:
 
 ```
 src/
-├── server.ts          # Main MCP server implementation
-├── taxUtils.ts        # Tax calculation utilities and types
-├── test.ts           # Test suite for tax calculations
-└── demo.ts           # Interactive demo showcasing features
+├── server.ts                    # Main MCP server implementation
+├── taxUtils.ts                  # Tax calculation utilities and types
+├── services/
+│   └── documentProcessor.ts     # Document processing service
+└── types/
+    └── taxDocuments.ts          # TypeScript interfaces for tax documents
+
+test/
+├── taxCalculation.test.ts       # Tax calculation tests
+├── documentProcessing.test.ts   # Document processing tests
+└── runAllTests.ts              # Test suite runner
+
+demos/
+├── demo.ts                     # Interactive tax calculation demo
+└── documentDemo.ts             # Document processing demo
 ```
 
 ## Tax Calculation Features

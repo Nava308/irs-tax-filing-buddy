@@ -2,7 +2,7 @@ import {
   calculateTax,
   FILING_STATUSES,
   getFilingDeadline,
-} from "./taxUtils.js";
+} from "../src/taxUtils.js";
 
 console.log("=== IRS Tax Filing Buddy - Interactive Demo ===\n");
 

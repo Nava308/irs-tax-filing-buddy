@@ -167,11 +167,11 @@ Please be accurate and only include information that is clearly stated in the do
     `;
   }
 
-    /**
+  /**
    * Simulate Claude processing (replace with actual Claude API call)
    */
   private async simulateClaudeProcessing(
-    prompt: string, 
+    prompt: string,
     _documents: TaxDocument[]
   ): Promise<any> {
     // This is a simulation - in real implementation, this would call Claude API
