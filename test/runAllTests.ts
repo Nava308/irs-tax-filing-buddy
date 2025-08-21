@@ -17,7 +17,8 @@ interface TestSuiteResult {
 
 const testSuites = [
   { name: "Tax Calculation Tests", file: "taxCalculation.test.js" },
-  { name: "Document Processing Tests", file: "documentProcessing.test.js" }
+  { name: "Document Processing Tests", file: "documentProcessing.test.js" },
+  { name: "Enhanced Features Tests", file: "enhancedFeatures.test.js" }
 ];
 
 async function runTestSuite(testFile: string): Promise<TestSuiteResult> {

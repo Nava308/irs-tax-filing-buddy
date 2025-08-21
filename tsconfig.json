@@ -23,13 +23,6 @@
     "allowUnusedLabels": false,
     "allowUnreachableCode": false
   },
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "demos/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*", "test/**/*", "demos/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

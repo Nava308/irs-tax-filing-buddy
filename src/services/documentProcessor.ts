@@ -9,9 +9,26 @@ import {
   TaxFilingData,
   TaxFilingResult,
 } from "../types/taxDocuments.js";
+import { ClaudeService } from "./claudeService.js";
+import { DocumentValidator } from "./documentValidator.js";
+import { PDFGenerator } from "./pdfGenerator.js";
 
 export class DocumentProcessor {
   private documents: Map<string, TaxDocument> = new Map();
+  private claudeService: ClaudeService;
+  private documentValidator: DocumentValidator;
+  private pdfGenerator: PDFGenerator;
+
+  constructor() {
+    try {
+      this.claudeService = new ClaudeService();
+    } catch (error) {
+      console.warn('Claude API not available, falling back to simulation mode');
+      this.claudeService = null as any;
+    }
+    this.documentValidator = new DocumentValidator();
+    this.pdfGenerator = new PDFGenerator();
+  }
 
   /**
    * Upload and store a tax document
@@ -29,6 +46,17 @@ export class DocumentProcessor {
       content,
       uploadedAt: new Date(),
     };
+
+    // Validate the document before storing
+    const validationResult = this.documentValidator.validateDocument(document);
+    
+    if (!validationResult.isValid) {
+      throw new Error(`Document validation failed: ${validationResult.errors.join(', ')}`);
+    }
+
+    if (validationResult.warnings.length > 0) {
+      console.warn(`Document warnings: ${validationResult.warnings.join(', ')}`);
+    }
 
     this.documents.set(documentId, document);
     return documentId;
@@ -50,19 +78,40 @@ export class DocumentProcessor {
       throw new Error("No documents found for processing");
     }
 
-    // Create a comprehensive prompt for Claude to process all documents
-    const processingPrompt = this.createProcessingPrompt(
-      documents,
-      filingStatus,
-      taxYear
-    );
+    // Validate all documents together
+    const validationResult = this.documentValidator.validateMultipleDocuments(documents);
+    
+    if (!validationResult.isValid) {
+      throw new Error(`Document validation failed: ${validationResult.errors.join(', ')}`);
+    }
 
-    // This would be sent to Claude for processing
-    // For now, we'll simulate the response
-    const processedData = await this.simulateClaudeProcessing(
-      processingPrompt,
-      documents
-    );
+    if (validationResult.warnings.length > 0) {
+      console.warn(`Document warnings: ${validationResult.warnings.join(', ')}`);
+    }
+
+    // Use real Claude service if available, otherwise fall back to simulation
+    let processedData;
+    if (this.claudeService) {
+      try {
+        processedData = await this.claudeService.processTaxDocuments(
+          documents,
+          filingStatus,
+          taxYear
+        );
+      } catch (error) {
+        console.warn('Claude API failed, falling back to simulation:', error);
+        processedData = await this.simulateClaudeProcessing(
+          this.createProcessingPrompt(documents, filingStatus, taxYear),
+          documents
+        );
+      }
+    } else {
+      // Fall back to simulation
+      processedData = await this.simulateClaudeProcessing(
+        this.createProcessingPrompt(documents, filingStatus, taxYear),
+        documents
+      );
+    }
 
     // Convert processed data to TaxFilingData
     return this.convertToTaxFilingData(processedData, filingStatus, taxYear);
@@ -85,7 +134,7 @@ export class DocumentProcessor {
     const calculatedTax = this.calculateCompleteTax(filingData);
 
     // Generate forms
-    const forms = this.generateForms(
+    const forms = await this.generateForms(
       filingData,
       calculatedTax,
       request.outputFormat
@@ -308,15 +357,15 @@ Please be accurate and only include information that is clearly stated in the do
   /**
    * Generate tax forms based on output format
    */
-  private generateForms(
+  private async generateForms(
     filingData: TaxFilingData,
     calculatedTax: CalculatedTax,
     outputFormat: string
-  ): GeneratedForm[] {
+  ): Promise<GeneratedForm[]> {
     const forms: GeneratedForm[] = [];
 
     // Generate Form 1040
-    const form1040 = this.generateForm1040(
+    const form1040 = await this.generateForm1040(
       filingData,
       calculatedTax,
       outputFormat
@@ -338,12 +387,12 @@ Please be accurate and only include information that is clearly stated in the do
   /**
    * Generate Form 1040
    */
-  private generateForm1040(
+  private async generateForm1040(
     filingData: TaxFilingData,
     calculatedTax: CalculatedTax,
     outputFormat: string
-  ): GeneratedForm {
-    const content = this.formatForm1040(
+  ): Promise<GeneratedForm> {
+    const content = await this.formatForm1040(
       filingData,
       calculatedTax,
       outputFormat
@@ -361,11 +410,11 @@ Please be accurate and only include information that is clearly stated in the do
   /**
    * Format Form 1040 based on output format
    */
-  private formatForm1040(
+  private async formatForm1040(
     filingData: TaxFilingData,
     calculatedTax: CalculatedTax,
     outputFormat: string
-  ): string {
+  ): Promise<string> {
     switch (outputFormat) {
       case "json":
         return JSON.stringify(
@@ -380,6 +429,16 @@ Please be accurate and only include information that is clearly stated in the do
           null,
           2
         );
+
+      case "pdf":
+        // For PDF, we return a base64 encoded string of the PDF buffer
+        try {
+          const buffer = await this.pdfGenerator.generateForm1040PDF(filingData, calculatedTax);
+          return buffer.toString('base64');
+        } catch (error) {
+          console.error('PDF generation failed:', error);
+          return this.generateText1040(filingData, calculatedTax);
+        }
 
       case "xml":
         return this.generateXML1040(filingData, calculatedTax);

@@ -10,6 +10,7 @@
     "test": "npm run build && node dist/test/runAllTests.js",
     "test:tax": "npm run build && node dist/test/taxCalculation.test.js",
     "test:docs": "npm run build && node dist/test/documentProcessing.test.js",
+    "test:enhanced": "npm run build && node dist/test/enhancedFeatures.test.js",
     "demo": "npm run build && node dist/demos/demo.js",
     "demo:documents": "npm run build && node dist/demos/documentDemo.js",
     "watch": "tsc --watch"
@@ -28,11 +29,14 @@
   "description": "IRS Tax Filing Buddy - A personal assistant for IRS tax filing assistance developed by Navaneeth",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.3",
+    "@anthropic-ai/sdk": "^0.18.0",
     "dotenv": "^16.5.0",
-    "zod": "^3.25.64"
+    "zod": "^3.25.64",
+    "pdfkit": "^0.14.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/pdfkit": "^0.13.0",
     "typescript": "^5.0.0"
   }
 }

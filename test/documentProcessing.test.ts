@@ -60,9 +60,9 @@ Federal Income Tax Withheld: $7,200
   await new Promise<void>((resolve) => {
     runTest("Multiple document upload", async () => {
       const documents = [
-        { filename: "w2_2024.txt", content: "W-2 content", type: "w2" as const },
-        { filename: "1099_int.txt", content: "1099-INT content", type: "1099" as const },
-        { filename: "1099_div.txt", content: "1099-DIV content", type: "1099" as const }
+        { filename: "w2_2024.txt", content: "FORM W-2 Wage and Tax Statement Employee: John Doe SSN: ***-**-1234 Employer: Test Company Wages: $50,000", type: "w2" as const },
+        { filename: "1099_int.txt", content: "FORM 1099-INT Interest Income Payer: Bank Recipient: John Doe", type: "1099" as const },
+        { filename: "1099_div.txt", content: "FORM 1099-DIV Dividends Payer: Fund Recipient: John Doe", type: "1099" as const }
       ];
       
       const documentIds: string[] = [];
@@ -108,7 +108,7 @@ Federal Income Tax Withheld: $10,200
   await new Promise<void>((resolve) => {
     runTest("Tax filing generation - JSON format", async () => {
       // Upload a document first
-      const w2Content = "FORM W-2 Test Content";
+      const w2Content = "FORM W-2 Wage and Tax Statement Employee: John Doe SSN: ***-**-1234 Employer: Test Company Wages: $50,000";
       const docId = await processor.uploadDocument("test_w2.txt", w2Content, "w2");
       
       const documents = [
@@ -144,7 +144,7 @@ Federal Income Tax Withheld: $10,200
   await new Promise<void>((resolve) => {
     runTest("Tax filing generation - XML format", async () => {
       // Upload a document first
-      const w2Content = "FORM W-2 XML Test Content";
+      const w2Content = "FORM W-2 Wage and Tax Statement Employee: John Doe SSN: ***-**-1234 Employer: Test Company Wages: $50,000";
       const docId = await processor.uploadDocument("test_w2_xml.txt", w2Content, "w2");
       
       const documents = [
@@ -177,7 +177,7 @@ Federal Income Tax Withheld: $10,200
   await new Promise<void>((resolve) => {
     runTest("Tax filing generation - Mail ready format", async () => {
       // Upload a document first
-      const w2Content = "FORM W-2 Mail Ready Test Content";
+      const w2Content = "FORM W-2 Wage and Tax Statement Employee: John Doe SSN: ***-**-1234 Employer: Test Company Wages: $50,000";
       const docId = await processor.uploadDocument("test_w2_mail.txt", w2Content, "w2");
       
       const documents = [

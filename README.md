@@ -19,6 +19,11 @@ IRS Tax Filing Buddy is an MCP (Model Context Protocol) server that provides com
 
 1. Clone or download this repository
 2. Install dependencies:
+3. Set up environment variables (optional):
+   ```bash
+   # Create .env file
+   CLAUDE_API_KEY=your_claude_api_key_here
+   ```
    ```bash
    npm install
    ```
@@ -56,6 +61,7 @@ npm run demo:documents      # Document processing demo
 npm test                    # Run all tests
 npm run test:tax           # Run only tax calculation tests
 npm run test:docs          # Run only document processing tests
+npm run test:enhanced      # Run only enhanced features tests
 ```
 
 ### Watch mode for development:
@@ -277,6 +283,32 @@ Filing Deadline: April 15, 2025
 }
 ```
 
+## Enhanced Features
+
+### 🔍 **Document Validation**
+- **Comprehensive validation rules** for all tax document types
+- **Security checks** for SSN masking and data integrity
+- **Cross-document consistency** validation
+- **Real-time warnings** for potential issues
+
+### 🤖 **Real Claude API Integration**
+- **Production-ready Claude API** integration (with fallback to simulation)
+- **Structured data extraction** from tax documents
+- **Error handling** and graceful degradation
+- **Configurable via environment variables**
+
+### 📄 **PDF Generation**
+- **Professional PDF forms** (Form 1040, Schedule C, Schedule D)
+- **Multiple output formats**: JSON, XML, PDF, IRS E-file, Mail-ready
+- **Complete tax filing packages** with all required forms
+- **Base64 encoded output** for easy transmission
+
+### 🛡️ **Security & Compliance**
+- **SSN masking validation** to prevent data exposure
+- **Document content validation** to ensure accuracy
+- **Error handling** with detailed feedback
+- **Graceful fallbacks** when services are unavailable
+
 ## Technical Details
 
 This project uses:
@@ -287,6 +319,9 @@ This project uses:
 - **StdioServerTransport** for communication
 - **Zod** for schema validation and parameter validation
 - **dotenv** for environment variable management
+- **@anthropic-ai/sdk** for Claude API integration
+- **pdfkit** for PDF generation
+- **TypeScript** for type safety and development experience
 
 ## Project Structure
 
@@ -295,13 +330,17 @@ src/
 ├── server.ts                    # Main MCP server implementation
 ├── taxUtils.ts                  # Tax calculation utilities and types
 ├── services/
-│   └── documentProcessor.ts     # Document processing service
+│   ├── documentProcessor.ts     # Document processing service
+│   ├── claudeService.ts         # Claude API integration
+│   ├── documentValidator.ts     # Document validation service
+│   └── pdfGenerator.ts          # PDF generation service
 └── types/
     └── taxDocuments.ts          # TypeScript interfaces for tax documents
 
 test/
 ├── taxCalculation.test.ts       # Tax calculation tests
 ├── documentProcessing.test.ts   # Document processing tests
+├── enhancedFeatures.test.ts     # Enhanced features tests
 └── runAllTests.ts              # Test suite runner
 
 demos/

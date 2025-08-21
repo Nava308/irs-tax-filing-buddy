@@ -124,4 +124,4 @@ export interface DocumentProcessingRequest {
   outputFormat: OutputFormat;
 }
 
-export type OutputFormat = "json" | "pdf" | "xml" | "irs_efile" | "mail_ready";
+export type OutputFormat = "json" | "pdf" | "xml" | "irs_efile" | "mail_ready" | "text";
