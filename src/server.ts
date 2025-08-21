@@ -2,12 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import dotenv from "dotenv";
 import { z } from "zod";
+import { DocumentProcessor } from "./services/documentProcessor.js";
 import {
   calculateTax,
   FILING_STATUSES,
   getFilingDeadline,
   TAX_BRACKETS,
 } from "./taxUtils.js";
+import { TaxDocumentType } from "./types/taxDocuments.js";
 
 dotenv.config();
 
@@ -23,6 +25,9 @@ const server = new McpServer(
     },
   }
 );
+
+// Initialize document processor
+const documentProcessor = new DocumentProcessor();
 
 // Tool function for IRS Tax Filing Buddy info
 async function getTaxBuddyInfo() {
@@ -312,6 +317,194 @@ server.registerTool(
         },
       ],
     };
+  }
+);
+
+// Document processing tools
+server.registerTool(
+  "uploadTaxDocument",
+  {
+    title: "Upload Tax Document",
+    description: "Upload a tax document for processing (W2, 1099, etc.)",
+    inputSchema: {
+      filename: z.string().describe("Name of the document file"),
+      content: z.string().describe("Content of the tax document"),
+      documentType: z
+        .enum([
+          "w2",
+          "1099",
+          "schedule_c",
+          "schedule_d",
+          "schedule_e",
+          "form_1040",
+          "other",
+        ])
+        .describe("Type of tax document"),
+    },
+  },
+  async ({ filename, content, documentType }) => {
+    try {
+      const documentId = await documentProcessor.uploadDocument(
+        filename,
+        content,
+        documentType
+      );
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Document uploaded successfully!\n\nDocument ID: ${documentId}\nFilename: ${filename}\nType: ${documentType}\n\nYou can now use this document ID with other tax processing tools.`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error uploading document: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "processTaxDocuments",
+  {
+    title: "Process Tax Documents",
+    description:
+      "Process uploaded tax documents with Claude and generate tax filing data",
+    inputSchema: {
+      documentIds: z
+        .array(z.string())
+        .describe("Array of document IDs to process"),
+      filingStatus: z
+        .enum(["single", "married", "head_of_household", "qualifying_widow"])
+        .describe("Filing status for tax calculation"),
+      taxYear: z.number().describe("Tax year (e.g., 2024)"),
+    },
+  },
+  async ({ documentIds, filingStatus, taxYear }) => {
+    try {
+      const filingData = await documentProcessor.processDocumentsWithClaude(
+        documentIds,
+        filingStatus,
+        taxYear
+      );
+
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              `Documents processed successfully!\n\nTax Filing Summary:\n` +
+              `Name: ${filingData.personalInfo.firstName} ${filingData.personalInfo.lastName}\n` +
+              `Filing Status: ${filingData.filingStatus}\n` +
+              `Tax Year: ${filingData.taxYear}\n` +
+              `Total Income: $${filingData.income.totalIncome.toLocaleString()}\n` +
+              `Wages: $${filingData.income.wages.toLocaleString()}\n` +
+              `Interest: $${filingData.income.interest.toLocaleString()}\n` +
+              `Dividends: $${filingData.income.dividends.toLocaleString()}\n\n` +
+              `Use the generateTaxFiling tool to create complete tax forms.`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error processing documents: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "generateTaxFiling",
+  {
+    title: "Generate Complete Tax Filing",
+    description: "Generate complete tax filing with forms in specified format",
+    inputSchema: {
+      documentIds: z
+        .array(z.string())
+        .describe("Array of document IDs to include"),
+      filingStatus: z
+        .enum(["single", "married", "head_of_household", "qualifying_widow"])
+        .describe("Filing status"),
+      taxYear: z.number().describe("Tax year"),
+      outputFormat: z
+        .enum(["json", "pdf", "xml", "irs_efile", "mail_ready"])
+        .describe("Output format for tax forms"),
+    },
+  },
+  async ({ documentIds, filingStatus, taxYear, outputFormat }) => {
+    try {
+      const documents = documentIds.map((id) => ({
+        id,
+        type: "other" as TaxDocumentType,
+        filename: `document_${id}`,
+        content: "",
+        uploadedAt: new Date(),
+      }));
+      const result = await documentProcessor.generateTaxFiling({
+        documents,
+        filingStatus,
+        taxYear,
+        outputFormat,
+      });
+
+      const summary = result.summary;
+      const forms = result.forms;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              `Tax Filing Generated Successfully!\n\n` +
+              `📊 SUMMARY:\n` +
+              `Total Income: $${summary.totalIncome.toLocaleString()}\n` +
+              `Total Deductions: $${summary.totalDeductions.toLocaleString()}\n` +
+              `Total Credits: $${summary.totalCredits.toLocaleString()}\n` +
+              `Tax Owed: $${summary.taxOwed.toLocaleString()}\n` +
+              `Refund Amount: $${summary.refundAmount.toLocaleString()}\n` +
+              `Filing Deadline: ${summary.filingDeadline}\n\n` +
+              `📋 FORMS GENERATED (${outputFormat.toUpperCase()} format):\n` +
+              forms
+                .map((form) => `• ${form.formNumber}: ${form.formType}`)
+                .join("\n") +
+              `\n\n` +
+              `📄 FORM CONTENTS:\n` +
+              forms
+                .map((form) => `\n--- ${form.formNumber} ---\n${form.content}`)
+                .join("\n"),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error generating tax filing: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 

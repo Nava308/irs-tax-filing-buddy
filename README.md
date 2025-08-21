@@ -231,11 +231,13 @@ src/
 To connect your IRS Tax Filing Buddy to Claude Desktop:
 
 ### 1. Build the Project
+
 ```bash
 npm run build
 ```
 
 ### 2. Add MCP Configuration to Claude Desktop
+
 Open Claude Desktop settings and add this configuration to the MCP section:
 
 ```json
@@ -243,7 +245,9 @@ Open Claude Desktop settings and add this configuration to the MCP section:
   "mcpServers": {
     "irs-tax-filing-buddy": {
       "command": "node",
-      "args": ["/Users/navaneethkumarbuddi/Desktop/irs-tax-filing-buddy/dist/server.js"],
+      "args": [
+        "/Users/navaneethkumarbuddi/Desktop/irs-tax-filing-buddy/dist/server.js"
+      ],
       "env": {
         "NODE_ENV": "production"
       }
@@ -255,10 +259,13 @@ Open Claude Desktop settings and add this configuration to the MCP section:
 **Note**: Update the path to match your actual project location.
 
 ### 3. Restart Claude Desktop
+
 After adding the configuration, restart Claude Desktop for the changes to take effect.
 
 ### 4. Test the Connection
+
 Once connected, you can ask Claude to use your tax tools:
+
 - "Who are you?" (uses `whoAreYou` tool)
 - "Calculate tax for $50,000 income as single filer" (uses `calculateTax` tool)
 - "What are the filing deadlines for 2024?" (uses `getFilingDeadline` tool)
@@ -266,6 +273,7 @@ Once connected, you can ask Claude to use your tax tools:
 - "Help me with tax deductions" (uses `getTaxAssistance` tool)
 
 ### Troubleshooting
+
 - **JSON parsing errors**: Make sure the server is built (`npm run build`)
 - **Server disconnected**: Check that the file path in the configuration is correct
 - **Tools not available**: Restart Claude Desktop after adding the configuration

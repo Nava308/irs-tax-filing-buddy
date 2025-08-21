@@ -9,6 +9,7 @@
     "dev": "tsc && node dist/server.js",
     "test": "node dist/test.js",
     "demo": "node dist/demo.js",
+    "demo:documents": "node dist/documentDemo.js",
     "watch": "tsc --watch"
   },
   "keywords": [
